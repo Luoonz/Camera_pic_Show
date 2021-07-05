@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             try {
+
+
                 InputStream in = getContentResolver().openInputStream(data.getData());
                 img = BitmapFactory.decodeStream(in);
                 in.close();
@@ -94,9 +97,16 @@ public class MainActivity extends AppCompatActivity {
                     File file = new File(mCurrentPhotoPath);
                     InputStream in = getContentResolver().openInputStream(Uri.fromFile(file));
                     img = BitmapFactory.decodeStream(in);
-                    mPhotoCircleImageView.setImageBitmap(img);
-                    in.close();
-
+//                    mPhotoCircleImageView.setImageBitmap(img);
+//                    in.close();
+                    Log.d(TAG, "촬영 후 가져온 사진 " + img);
+                    // 보낼 준비
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    img.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    Intent it = new Intent(getApplicationContext(), GetImageActivity.class);
+                    it.putExtra("image", byteArray);
+                    startActivity(it);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     private void takePictureFromCameraIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) == null) {
             // Create the File where the photo should go
             File photoFile = null;
             try {

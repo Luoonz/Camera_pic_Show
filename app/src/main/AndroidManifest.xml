@@ -23,6 +23,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".GetImageActivity"></activity>
+
         <!-- 폰 내부 파일 저장 위한 보안성에 관한 절차 처리. -->
         <provider
             android:name="androidx.core.content.FileProvider"
